@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>输入框</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+     #input-contain{
+     	display: inline-block;
+     	width:200px;
+     	height:30px;
+     	border: 1px solid #d8d8d8;
+     	border-radius: 5px;
+     }
+     span{
+      margin-left: 10px;
+      font-size: 12px;
+      color:#d8d8d8;
+     }
+	</style>
+	<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="js/Class-create.js"></script>
+	<script type="text/javascript">
+	//1.
+      // $(function(){
+      // 		  //1.获取元素
+      // 	   var numMax = 20;
+      //      var vInput = $('#input-contain');
+      //      //2.获取字数
+      //      var getNum = function(){
+                    //这里的val()是获取input的value值
+      //      	    return vInput.val().length;
+      //      }
+      //      //3.渲染元素
+      //      var render = function(){
+      //      	   var num = getNum();
+      //      	   var vInput_after = $('#input-contain-count');
+                   //若没有数字容器，就自己创建一个
+      //      	   if(vInput_after.length == 0){
+                         //after表示在制定元素后面插入特定内容
+      //      	   	     vInput.after('<span id="input-contain-count"></span>');
+      //      	   	     console.log(vInput_after);
+      //      	   }
+      //      	   if(numMax-num < 0|| numMax-num === 0){
+      //      	   	    vInput_after.html('还能输入0个字');
+      //      	   }else{
+      //      	   	    vInput_after.html('还能输入'+(numMax-num)+'个字');
+      //      	   }
+      //      }
+      //      //4.监听事件
+      //      vInput.on('input',function(){
+      //      	render();
+      //      });
+      //      //5.初始化
+      //      render();
+      // });
+      //代码没有很好的隔离作用域，很难维护，很容易和其他代码起冲突
+      //2.使用作用域隔离做优化，模拟命名空间
+//       var inputCount = {
+//       	numMax : 20,
+//       	num : 0, 
+//       	vInput : null,
+//       	vInput_after : null,
+//       	init : function(targat){
+               //这里的this指向当前对象inputCount
+//             this.vInput = $(targat.id);
+//             this.bind();
+//             return this;
+//       	},
+//       	bind : function(){
+            //这里的this作为inputCount对象内bind方法的内部函数，在这个内部函数里this是指向全局，故
+            //将之前的this先存下来，便于在函数内部使用
+//       		var _this = this;
+//       		this.vInput.on('input',function(){
+//       			_this.render();
+//       		});
+//       	},
+//       	getNum : function(){
+//       		return this.vInput.val().length;
+//       	},
+//         render : function(){
+//         	   this.num = this.getNum();
+//            	   this.vInput_after = $('#input-contain-count');
+//            	   if(this.vInput_after.length == 0){
+//            	   	     this.vInput.after('<span id="input-contain-count"></span>');
+//            	   }
+//            	   if(this.numMax-this.num < 0|| this.numMax-this.num === 0){
+//            	   	    this.vInput_after.html('还能输入0个字');
+//            	   }else{
+//            	   	    this.vInput_after.html('还能输入'+(this.numMax-this.num)+'个字');
+//            	   }
+//         }
+// }
+// $(function(){
+// 	inputCount.init({
+// 		id : '#input-contain'
+// 	}).render();
+// })
+//上面的写法已经不错了，但是没有私有的概念，有些函数我们只能自己在内部使用，不能让外部随意去修改的
+    //3.使用闭包的方法，让方法私有,getName, bind应该是私有的方法,私有方法一般以_开头
+    // var inputCount = (function(){
+    // 	var vInput_after = null;
+    //  var numMax = 20;
+    // 	var _bind =function(that){
+    //          that.vInput.on('input',function(){
+    //          	that.render();
+    //          });
+    // 	}
+    //  var _getNum =function(that){
+    //          return that.vInput.val().length;
+    //  }
+    //  var inputCountFunc = function(target){}
+    //  inputCountFunc.prototype.init = function(target){
+    //     	  this.vInput = $(target.id);
+    //           _bind(this);
+    //           return this;
+    //     }
+    //  inputCountFunc.prototype.render = function(){
+    //           var num = _getNum(this);
+    //           this.vInput_after = $('#input-contain-count');
+    //        	   if(this.vInput_after.length == 0){
+    //        	   	     this.vInput.after('<span id="input-contain-count"></span>');
+    //        	   }
+    //        	   if(numMax-num < 0|| numMax-num === 0){
+    //        	   	    this.vInput_after.html('还能输入0个字');
+    //        	   }else{
+    //        	   	    this.vInput_after.html('还能输入'+(numMax-num)+'个字');
+    //        	   }
+    //     }
+    //     return inputCountFunc;
+    // })();
+    // $(function(){
+    // 	new inputCount().init({
+    //       id : '#input-contain'
+    // 	}).render();
+    // });
+
+     //4.面向对象：
+     //抽出一个公用的base
+     // var  Base = Class.extend({
+     // 	//自动保存配置项
+     // 	init : function(target){
+     // 		this._target = target;
+     // 		this.bind();
+     // 		this.render();
+     // 	},
+     // 	//设置配置项
+     // 	set : function(key, value){
+     //       return this._target[key] = value;
+     // 	},
+     // 	//获取配置项
+     // 	get : function(key){
+     // 		return this._target[key];
+     // 	},
+     // 	//事件绑定
+     // 	bind : function(){},
+     // 	//渲染
+     // 	render : function(){}
+     // });
+     //InputCount类
+     // var InputCount = Class.extend(Base,{
+     // 	//获取目标长度
+     // 	_getNum : function(){
+     // 		return this.get('input').val().length;
+     // 	},
+     // 	bind : function(){
+     // 		var that = this;
+     // 		that.get('input').on('input',function(){
+     // 		that.render();
+     // 		})
+     // 	},
+     // 	render : function(){
+     // 		var numMax = 20;
+     // 		var num =this. _getNum();
+     //        var vInput_after = $('#input-contain-count');
+     //       	   if(vInput_after.length == 0){
+     //       	   	     this.get('input').after('<span id="input-contain-count"></span>');
+     //       	   }
+     //       	   if(numMax-num < 0|| numMax-num === 0){
+     //       	   	   vInput_after.html('还能输入0个字');
+     //       	   }else{
+     //       	   	    vInput_after.html('还能输入'+(numMax-num)+'个字');
+     //       	   }
+     // 	}
+     // });
+     // $(function(){
+     // 	new InputCount({
+     // 		input : $('#input-contain')
+     // 	});
+     // })
+  
+    //5.观察者模式
+    //辅组函数，获取数组里某个元素的索引 index
+var _indexOf = function(array,key){
+  if (array === null) return -1
+  var i = 0, length = array.length
+  for (; i < length; i++) if (array[i] === item) return i
+  return -1
+}
+//观察值机制
+var Event = Class.extend({
+  //添加监听
+  on:function(key,listener){
+    //this.__events存储所有的处理函数
+    if (!this.__events) {
+      this.__events = {}
+    }
+    if (!this.__events[key]) {
+      this.__events[key] = []
+    }
+    if (_indexOf(this.__events,listener) === -1 && typeof listener === 'function') {
+      this.__events[key].push(listener)
+    }
+
+    return this
+  },
+  //触发一个事件，也就是通知
+  fire:function(key){
+
+    if (!this.__events || !this.__events[key]) return
+
+    var args = Array.prototype.slice.call(arguments, 1) || []
+
+    var listeners = this.__events[key]
+    var i = 0
+    var l = listeners.length
+
+    for (i; i < l; i++) {
+      listeners[i].apply(this,args)
+    }
+
+    return this
+  },
+  //取消监听
+  off:function(key,listener){
+
+    if (!key && !listener) {
+      this.__events = {}
+    }
+    //不传监听函数，就去掉当前key下面的所有的监听函数
+    if (key && !listener) {
+      delete this.__events[key]
+    }
+
+    if (key && listener) {
+      var listeners = this.__events[key]
+      var index = _indexOf(listeners, listener)
+
+      (index > -1) && listeners.splice(index, 1)
+    }
+
+    return this;
+  }
+})
+//我们的Base
+var  Base = Class.extend(Event,{
+       //自动保存配置项
+       init : function(target){
+         this._target = target;
+         this.bind();
+         this.render();
+       },
+       //设置配置项
+       set : function(key, value){
+           return this._target[key] = value;
+       },
+       //获取配置项
+       get : function(key){
+         return this._target[key];
+       },
+       //事件绑定
+       bind : function(){},
+       //渲染
+       render : function(){}
+     });
+//实例化所需要的类
+var InputCount = Class.extend(Base,{
+       //获取目标长度
+       _getNum : function(){
+        //val()表示input的value()值
+         return this.get('input').val().length;
+       },
+       bind : function(){
+         var that = this;
+         that.get('input').on('input',function(){
+         //观察输入，并且将通知发布出去
+         that.fire('input',that._getNum());
+         that.render();
+         })
+       },
+       render : function(){
+         var numMax = 20;
+         var num =this. _getNum();
+            var vInput_after = $('#input-contain-count');
+               //这里的length 属性表示对象中元素的数目
+               //若是没有数字容器，就创建一个出来
+                if(vInput_after.length == 0){
+                      //在被选中元素后面插入特定内容
+                      this.get('input').after('<span id="input-contain-count"></span>');
+                }
+              
+                     vInput_after.html('还能输入'+(numMax-num)+'个字');
+                
+       }
+     });
+     $(function(){
+       var numMax = 20;
+       var one = new InputCount({
+         input : $('#input-contain')
+       });
+       //监听输入事件，发现边界值，立马做处理
+       one.on('input',function(num){
+          if(numMax-num < 0|| numMax-num === 0){
+                    $('#input-contain-count').html('还能输入0个字');  }
+       })
+     })
+	</script>
+</head>
+<body>
+		<input type="text" placeholder="不大于20字" maxlength="20" id="input-contain" />
+</body>
+</html>
