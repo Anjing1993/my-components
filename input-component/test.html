@@ -307,6 +307,7 @@ var InputCount = Class.extend(Base,{
        var one = new InputCount({
          input : $('#input-contain')
        });
+       console.log(one._getNum());
        //监听输入事件，发现边界值，立马做处理
        one.on('input',function(num){
           if(numMax-num < 0|| numMax-num === 0){
@@ -316,6 +317,6 @@ var InputCount = Class.extend(Base,{
 	</script>
 </head>
 <body>
-		<input type="text" placeholder="不大于20字" maxlength="20" id="input-contain" />
+		<input type="text" placeholder="不大于20字" maxlength="20" id="input-contain" value="" />
 </body>
 </html>

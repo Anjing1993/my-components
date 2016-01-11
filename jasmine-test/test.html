@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>component test</title>
+	<style type="text/css">
+     #input-contain{
+     	display: inline-block;
+     	width:200px;
+     	height:30px;
+     	border: 1px solid #d8d8d8;
+     	border-radius: 5px;
+     }
+     span{
+      margin-left: 10px;
+      font-size: 12px;
+      color:#d8d8d8;
+     }
+	</style>
+	<script type="text/javascript" src="source/js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="source/js/Class-create.js"></script>
+	<link rel="stylesheet" type="text/css" href="source/jasmine.css">
+	<!--核心文件，用于执行单元测试的类库-->
+	<script type="text/javascript" src="source/jasmine.js"></script>
+	<!--用于显示单元测试结果的类库-->
+	<script type="text/javascript" src="source/jasmine-html.js"></script>
+	<!--用于启动单元测试的js-->
+	<script type="text/javascript" src="source/boot.js"></script>
+	<!--我们自己的业务逻辑代码-->
+	<script type="text/javascript" src="source/src.js"></script>
+	<!--单元测试代码-->
+    <script type="text/javascript">
+     //进行单元测试
+     (function(){
+         describe('component test',function(){
+       it('init test',function(){
+       	var InputCount = Class.extend(Base,{
+       //获取目标长度
+       _getNum : function(){
+        //val()表示input的value()值
+         return this.get('input').val().length;
+       },
+       bind : function(){
+         var that = this;
+         that.get('input').on('input',function(){
+         //观察输入，并且将通知发布出去
+         that.fire('input',that._getNum());
+         that.render();
+         })
+       },
+       render : function(){
+         var numMax = 20;
+         var num =this. _getNum();
+            var vInput_after = $('#input-contain-count');
+               //这里的length 属性表示对象中元素的数目
+               //若是没有数字容器，就创建一个出来
+                if(vInput_after.length == 0){
+                      //在被选中元素后面插入特定内容
+                      this.get('input').after('<span id="input-contain-count"></span>');
+                }
+              
+                     vInput_after.html('还能输入'+(numMax-num)+'个字');
+                
+       }
+     });
+       var numMax = 20;
+       var one = new InputCount({
+         input : $('#input-contain')
+       });
+       //监听输入事件，发现边界值，立马做处理
+       one.on('input',function(num){
+          if(numMax-num < 0|| numMax-num === 0){
+                    $('#input-contain-count').html('还能输入0个字');  }
+       })
+       expect(one._getNum()).toBe(1);
+       expect(one.render()).toBe();
+
+       })
+   })
+})();
+
+
+</script>
+</head>
+<body>
+<h1>component test</h1>
+<input type="text" placeholder="不大于20字" maxlength="20" id="input-contain" value="1" />
+
+
+</body>
+
+</html>
